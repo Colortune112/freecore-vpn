@@ -224,8 +224,11 @@ ffigen:
       - "hiddify-core/bin/desktop.h"
 
 sentry:
-  upload_debug_symbols: true
-  upload_source_maps: true
-  upload_sources: true
+  # FreeCore: у нас нет Sentry-проекта/аккаунта, поэтому upload-шаги после
+  # сборки падают ("auth_token not set"). Отключаем все upload — sentry_flutter
+  # runtime остаётся (без DSN это просто no-op observer).
+  upload_debug_symbols: false
+  upload_source_maps: false
+  upload_sources: false
   log_level: info
   ignore_missing: true
