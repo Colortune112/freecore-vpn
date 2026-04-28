@@ -86,6 +86,27 @@ jobs:
       - name: Run build_runner (Riverpod / freezed / drift codegen)
         run: dart run build_runner build --delete-conflicting-outputs
 
+      # Prebuilt sing-box нативная библиотека (Go).
+      # Hiddify Makefile тянет её из releases/hiddify-next-core/v<core.version>.
+      # Без этого `flutter build {macos,windows,linux,apk}` падает на копировании
+      # отсутствующего hiddify-core.{dylib,dll,so,aar}.
+      # core.version читается из dependencies.properties.
+      - name: Download hiddify-core prebuilt libs
+        shell: bash
+        run: |
+          CORE_VERSION=$(grep '^core.version=' dependencies.properties | cut -d= -f2)
+          BASE="https://github.com/hiddify/hiddify-next-core/releases/download/v${CORE_VERSION}"
+          mkdir -p hiddify-core/bin
+          case "${{ matrix.platform }}" in
+            macos)   ARCHIVE="hiddify-lib-macos.tar.gz" ;;
+            windows) ARCHIVE="hiddify-lib-windows-amd64.tar.gz" ;;
+            linux)   ARCHIVE="hiddify-lib-linux-amd64.tar.gz" ;;
+            android) ARCHIVE="hiddify-lib-android.tar.gz" ;;
+          esac
+          echo "Downloading: ${BASE}/${ARCHIVE}"
+          curl -fL "${BASE}/${ARCHIVE}" | tar xz -C hiddify-core/bin/
+          ls -la hiddify-core/bin/
+
       # ─── Сборка ──────────────────────────────────────────────────────
       - name: Build macOS
         if: matrix.platform == 'macos'
