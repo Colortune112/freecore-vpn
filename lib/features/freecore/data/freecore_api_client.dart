@@ -56,6 +56,64 @@ class FreeCoreApiClient {
     }
   }
 
+  /// POST /api/login_init — старт TG-логина. Возвращает state + login_url.
+  Future<FreeCoreLoginInitResult> loginInit({
+    required String deviceId,
+    required String platform,
+  }) async {
+    try {
+      final res = await _dio.post<Map<String, dynamic>>(
+        FreeCoreApi.loginInitPath,
+        data: {'device_id': deviceId, 'platform': platform},
+      );
+      final body = res.data ?? const {};
+      if (body['ok'] == true) {
+        return FreeCoreLoginInitSuccess(
+          state:     body['state']?.toString() ?? '',
+          loginUrl:  body['login_url']?.toString() ?? '',
+          expiresIn: (body['expires_in'] as num?)?.toInt() ?? 300,
+        );
+      }
+      return FreeCoreLoginInitError(body['error']?.toString() ?? 'unknown');
+    } on DioException catch (e) {
+      return FreeCoreLoginInitError(_dioErrorCode(e));
+    } catch (_) {
+      return const FreeCoreLoginInitError('network');
+    }
+  }
+
+  /// POST /api/login_check — поллинг сессии. Возвращает sub_url когда юзер
+  /// подтвердил вход в TG-боте.
+  Future<FreeCoreLoginCheckResult> loginCheck({
+    required String state,
+    required String deviceId,
+    required String platform,
+  }) async {
+    try {
+      final res = await _dio.post<Map<String, dynamic>>(
+        FreeCoreApi.loginCheckPath,
+        data: {'state': state, 'device_id': deviceId, 'platform': platform},
+      );
+      final body = res.data ?? const {};
+      if (body['ok'] == true) {
+        return FreeCoreLoginCheckSuccess(
+          status:     body['status']?.toString() ?? 'confirmed',
+          tgId:       (body['tg_id'] as num?)?.toInt() ?? 0,
+          subUrl:     body['sub_url']?.toString(),
+          plan:       body['plan']?.toString(),
+          expiresAt:  body['expires_at']?.toString(),
+          servers:    _parseServers(body['servers']),
+          migrated:   body['migrated'] == true,
+        );
+      }
+      return FreeCoreLoginCheckPending(body['error']?.toString() ?? 'unknown');
+    } on DioException catch (e) {
+      return FreeCoreLoginCheckPending(_dioErrorCode(e));
+    } catch (_) {
+      return const FreeCoreLoginCheckPending('network');
+    }
+  }
+
   /// POST /api/sync_external — обновить состояние подписки по device_id.
   /// Идемпотентен, безопасен для частого вызова. Если устройство не активировано
   /// (404) — возвращает [FreeCoreSyncError('device_not_registered')].
@@ -162,4 +220,55 @@ class FreeCoreSyncError extends FreeCoreSyncResult {
   const FreeCoreSyncError(this.code, {this.httpStatus});
   final String code;
   final int? httpStatus;
+}
+
+// ---- TG login result types ----
+
+sealed class FreeCoreLoginInitResult {
+  const FreeCoreLoginInitResult();
+}
+
+class FreeCoreLoginInitSuccess extends FreeCoreLoginInitResult {
+  const FreeCoreLoginInitSuccess({
+    required this.state,
+    required this.loginUrl,
+    required this.expiresIn,
+  });
+  final String state;
+  final String loginUrl;
+  final int expiresIn;
+}
+
+class FreeCoreLoginInitError extends FreeCoreLoginInitResult {
+  const FreeCoreLoginInitError(this.code);
+  final String code;
+}
+
+sealed class FreeCoreLoginCheckResult {
+  const FreeCoreLoginCheckResult();
+}
+
+class FreeCoreLoginCheckSuccess extends FreeCoreLoginCheckResult {
+  const FreeCoreLoginCheckSuccess({
+    required this.status,
+    required this.tgId,
+    required this.subUrl,
+    required this.plan,
+    required this.expiresAt,
+    required this.servers,
+    required this.migrated,
+  });
+  final String status;
+  final int tgId;
+  final String? subUrl;
+  final String? plan;
+  final String? expiresAt;
+  final List<FreeCoreServer> servers;
+  final bool migrated;
+}
+
+class FreeCoreLoginCheckPending extends FreeCoreLoginCheckResult {
+  const FreeCoreLoginCheckPending(this.code);
+  /// 'pending' | 'expired' | 'session_not_found' | 'network' | 'timeout' | ...
+  final String code;
 }

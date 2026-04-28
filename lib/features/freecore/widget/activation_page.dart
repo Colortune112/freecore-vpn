@@ -96,7 +96,33 @@ class ActivationPage extends HookConsumerWidget {
                           )
                         : const Text('Активировать', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: theme.dividerColor)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'или',
+                          style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: theme.dividerColor)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.send_outlined),
+                    label: const Text('Войти через Telegram', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: theme.colorScheme.primary, width: 1.4),
+                      foregroundColor: theme.colorScheme.primary,
+                    ),
+                    onPressed: state is FreeCoreSubmitting ? null : () => context.push('/login-tg'),
+                  ),
+                  const SizedBox(height: 24),
                   _SupportLink(),
                   const SizedBox(height: 16),
                 ],

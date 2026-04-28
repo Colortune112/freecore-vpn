@@ -9,6 +9,7 @@ import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/features/about/widget/about_page.dart';
 import 'package:hiddify/features/freecore/notifier/freecore_activation_notifier.dart';
 import 'package:hiddify/features/freecore/widget/activation_page.dart';
+import 'package:hiddify/features/freecore/widget/tg_login_page.dart';
 import 'package:hiddify/features/home/widget/home_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
 import 'package:hiddify/features/log/overview/logs_page.dart';
@@ -70,11 +71,13 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
         // регион) тоже остаётся, но ПОСЛЕ активации.
         final freecoreActivated = ref.read(freecoreActivatedProvider);
         final isActivate = state.matchedLocation == '/activate';
+        final isTgLogin  = state.matchedLocation == '/login-tg';
         if (!freecoreActivated) {
-          return isActivate ? null : '/activate';
+          // /login-tg доступен с экрана активации (push) — пропускаем туда без редиректа.
+          return (isActivate || isTgLogin) ? null : '/activate';
         }
-        if (isActivate) {
-          // Активация уже пройдена, юзер случайно открыл /activate (deep link).
+        if (isActivate || isTgLogin) {
+          // Уже активирован — игнорируем deep-link на /activate или /login-tg.
           return '/home';
         }
 
@@ -263,6 +266,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
         ),
         GoRoute(name: 'intro', path: '/intro', builder: (_, _) => const IntroPage()),
         GoRoute(name: 'activate', path: '/activate', builder: (_, _) => const ActivationPage()),
+        GoRoute(name: 'login-tg', path: '/login-tg', builder: (_, _) => const TgLoginPage()),
       ],
     );
   }

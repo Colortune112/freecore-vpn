@@ -6,8 +6,10 @@
 class FreeCoreApi {
   static const String baseUrl = 'https://sub.optimizator-pc.ru:8443';
 
-  static const String redeemPath = '/api/redeem_external';
-  static const String syncPath   = '/api/sync_external';
+  static const String redeemPath     = '/api/redeem_external';
+  static const String syncPath       = '/api/sync_external';
+  static const String loginInitPath  = '/api/login_init';
+  static const String loginCheckPath = '/api/login_check';
 
   static String get supportTelegram => 'https://t.me/FreeCore_VPN_bot';
 }
