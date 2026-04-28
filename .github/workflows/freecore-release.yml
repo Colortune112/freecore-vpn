@@ -96,16 +96,19 @@ jobs:
         run: |
           CORE_VERSION=$(grep '^core.version=' dependencies.properties | cut -d= -f2)
           BASE="https://github.com/hiddify/hiddify-next-core/releases/download/v${CORE_VERSION}"
-          mkdir -p hiddify-core/bin
+          # Android получает Go-mobile AAR в android/app/libs/ (Gradle ищет там).
+          # Desktop платформы получают .dylib/.so/.dll в hiddify-core/bin/
+          # (CMake/Xcode/MSBuild смотрят туда). Hiddify Makefile lines 43+45.
           case "${{ matrix.platform }}" in
-            macos)   ARCHIVE="hiddify-lib-macos.tar.gz" ;;
-            windows) ARCHIVE="hiddify-lib-windows-amd64.tar.gz" ;;
-            linux)   ARCHIVE="hiddify-lib-linux-amd64.tar.gz" ;;
-            android) ARCHIVE="hiddify-lib-android.tar.gz" ;;
+            macos)   ARCHIVE="hiddify-lib-macos.tar.gz";        DEST="hiddify-core/bin" ;;
+            windows) ARCHIVE="hiddify-lib-windows-amd64.tar.gz"; DEST="hiddify-core/bin" ;;
+            linux)   ARCHIVE="hiddify-lib-linux-amd64.tar.gz";  DEST="hiddify-core/bin" ;;
+            android) ARCHIVE="hiddify-lib-android.tar.gz";      DEST="android/app/libs" ;;
           esac
-          echo "Downloading: ${BASE}/${ARCHIVE}"
-          curl -fL "${BASE}/${ARCHIVE}" | tar xz -C hiddify-core/bin/
-          ls -la hiddify-core/bin/
+          mkdir -p "$DEST"
+          echo "Downloading: ${BASE}/${ARCHIVE} → ${DEST}/"
+          curl -fL "${BASE}/${ARCHIVE}" | tar xz -C "$DEST/"
+          ls -la "$DEST/"
 
       # ─── Сборка ──────────────────────────────────────────────────────
       - name: Build macOS
