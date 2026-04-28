@@ -127,6 +127,30 @@ jobs:
           cd build/windows/x64/runner/Release
           7z a -r "$GITHUB_WORKSPACE/${{ matrix.artifact }}" .
 
+      # Собираем NSIS-installer: один файл FreeCoreVPN-Setup.exe который
+      # ставит приложение в Program Files\FreeCore VPN\, создаёт ярлыки в
+      # Пуск и на Рабочем столе. Юзер видит один установщик вместо папки
+      # с .exe + DLL + data/.
+      - name: Build NSIS installer (Windows)
+        if: matrix.platform == 'windows'
+        shell: bash
+        run: |
+          # NSIS уже стоит на windows-latest runner.
+          NSIS="/c/Program Files (x86)/NSIS/makensis.exe"
+          if [ ! -f "$NSIS" ]; then
+            choco install nsis -y --no-progress
+            NSIS="/c/Program Files (x86)/NSIS/makensis.exe"
+          fi
+          SRC="$GITHUB_WORKSPACE/build/windows/x64/runner/Release"
+          OUT="$GITHUB_WORKSPACE/FreeCoreVPN-Setup.exe"
+          cd windows
+          "$NSIS" -V2 \
+            "-DSOURCE_DIR=$(cygpath -w "$SRC")" \
+            "-DOUTPUT=$(cygpath -w "$OUT")" \
+            "-DVERSION=${GITHUB_REF_NAME#v}" \
+            installer.nsi
+          ls -lh "$OUT"
+
       - name: Build Linux
         if: matrix.platform == 'linux'
         run: |
@@ -144,11 +168,22 @@ jobs:
              "$GITHUB_WORKSPACE/${{ matrix.artifact }}"
 
       # ─── Загрузка артефакта ──────────────────────────────────────────
-      - name: Upload artifact
+      - name: Upload artifact (zip)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.platform }}
           path: ${{ matrix.artifact }}
+          if-no-files-found: error
+          retention-days: 30
+
+      # Дополнительный артефакт — Windows installer .exe (один файл, идёт в
+      # GitHub Release как "FreeCoreVPN-Setup.exe").
+      - name: Upload Windows installer
+        if: matrix.platform == 'windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: FreeCoreVPN-Setup.exe
           if-no-files-found: error
           retention-days: 30
 
@@ -179,5 +214,6 @@ jobs:
           files: |
             artifacts/macos/*
             artifacts/windows/*
+            artifacts/windows-installer/*
             artifacts/linux/*
             artifacts/android/*
