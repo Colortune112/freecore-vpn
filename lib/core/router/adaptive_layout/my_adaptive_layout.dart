@@ -98,12 +98,17 @@ class MyAdaptiveLayout extends HookConsumerWidget {
     navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
   }
 
+  // FreeCore: убираем из sidebar Logs и About — они для разработчиков, обычному
+  // юзеру не нужны. Profiles тоже скрываем — у нас профиль один (FreeCore VPN),
+  // добавляется автоматически при активации, юзер с ним не работает напрямую.
+  // Routes остаются (StatefulShellRoute не трогаем) — глубокие ссылки и
+  // settings → "Перейти в логи" продолжают работать, но в sidebar чисто.
   List<ShellRouteAction> _actions(Translations t, bool showProfilesAction, bool isMobileBreakpoint) => [
     ShellRouteAction(Icons.power_settings_new_rounded, t.pages.home.title),
-    if (showProfilesAction && !isMobileBreakpoint) ShellRouteAction(Icons.view_list_rounded, t.pages.profiles.title),
+    // ShellRouteAction(Icons.view_list_rounded, t.pages.profiles.title), // FreeCore: hidden
     ShellRouteAction(Icons.settings_rounded, t.pages.settings.title),
-    if (!isMobileBreakpoint) ShellRouteAction(Icons.description_rounded, t.pages.logs.title),
-    if (!isMobileBreakpoint) ShellRouteAction(Icons.info_rounded, t.pages.about.title),
+    // ShellRouteAction(Icons.description_rounded, t.pages.logs.title),   // FreeCore: hidden
+    // ShellRouteAction(Icons.info_rounded, t.pages.about.title),         // FreeCore: hidden
   ];
 
   List<NavigationDestination> _navDests(List<ShellRouteAction> actions) =>

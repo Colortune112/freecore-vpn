@@ -158,6 +158,7 @@ flutter:
     # FreeCore brand assets
     - assets/freecore/app_icon.png
     - assets/freecore/splash.png
+    - assets/freecore/door_transparent.png
     # - assets/core/geoip.db
     # - assets/core/geosite.db
     - assets/images/logo.svg

@@ -36,15 +36,9 @@ class HomePage extends HookConsumerWidget {
           children: [
             Image.asset('assets/freecore/app_icon.png', height: 24, width: 24),
             const Gap(8),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: t.common.appTitle),
-                  const TextSpan(text: " "),
-                  const WidgetSpan(child: AppVersionLabel(), alignment: PlaceholderAlignment.middle),
-                ],
-              ),
-            ),
+            // FreeCore: только название без dev-метки версии — конечный
+            // юзер не видит "1.0.0 dev" рядом с лого.
+            Text(t.common.appTitle, style: Theme.of(context).textTheme.titleLarge),
           ],
         ),
         actions: [

@@ -246,12 +246,17 @@ class _ConnectionButton extends StatelessWidget {
                       if (useImage) {
                         return image.image();
                       } else {
-                        // FreeCore brand: цветная иконка двери, без BlendMode.srcIn
-                        // (тот превращал SVG в одноцветный силуэт, что убивало бы
-                        // нашу палитру cream + cobalt). Цветовое состояние кнопки
-                        // (`value`) теперь отражается только через scale/opacity у
-                        // родителя, иконка остаётся брендированной.
-                        return Image.asset('assets/freecore/app_icon.png', fit: BoxFit.contain);
+                        // FreeCore: дверь с прозрачным фоном + BlendMode.srcIn —
+                        // силуэт перекрашивается под состояние кнопки (cobalt в
+                        // disconnected, primary в connected). Это даёт smooth
+                        // цветовой переход как в оригинальной Hiddify-кнопке,
+                        // но с нашим брендингом.
+                        return Image.asset(
+                          'assets/freecore/door_transparent.png',
+                          fit: BoxFit.contain,
+                          color: value,
+                          colorBlendMode: BlendMode.srcIn,
+                        );
                       }
                     },
                   ),
