@@ -246,7 +246,12 @@ class _ConnectionButton extends StatelessWidget {
                       if (useImage) {
                         return image.image();
                       } else {
-                        return Assets.images.logo.svg(colorFilter: ColorFilter.mode(value!, BlendMode.srcIn));
+                        // FreeCore brand: цветная иконка двери, без BlendMode.srcIn
+                        // (тот превращал SVG в одноцветный силуэт, что убивало бы
+                        // нашу палитру cream + cobalt). Цветовое состояние кнопки
+                        // (`value`) теперь отражается только через scale/opacity у
+                        // родителя, иконка остаётся брендированной.
+                        return Image.asset('assets/freecore/app_icon.png', fit: BoxFit.contain);
                       }
                     },
                   ),

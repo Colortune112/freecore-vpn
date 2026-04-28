@@ -89,7 +89,7 @@ class AboutPage extends HookConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Assets.images.logo.svg(width: 64, height: 64),
+                  Image.asset('assets/freecore/app_icon.png', width: 64, height: 64),
                   const Gap(16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
