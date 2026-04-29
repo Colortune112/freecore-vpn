@@ -2,15 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 abstract class Constants {
-  static const appName = "Hiddify";
-  static const githubUrl = "https://github.com/hiddify/hiddify-next";
-  static const licenseUrl = "https://github.com/hiddify/hiddify-next?tab=License-1-ov-file#readme";
-  static const githubReleasesApiUrl = "https://api.github.com/repos/hiddify/hiddify-next/releases";
-  static const githubLatestReleaseUrl = "https://github.com/hiddify/hiddify-app/releases/latest";
-  static const appCastUrl = "https://raw.githubusercontent.com/hiddify/hiddify-next/main/appcast.xml";
-  static const telegramChannelUrl = "https://t.me/hiddify";
-  static const privacyPolicyUrl = "https://hiddify.com/privacy-policy/";
-  static const termsAndConditionsUrl = "https://hiddify.com/terms/";
+  // FreeCore VPN: переключаем все brand-URL'ы на наш форк, чтобы:
+  //   - app_update_repository чекал релизы НАШЕГО репо (Colortune112/freecore-vpn),
+  //     а не upstream Hiddify (он бы предлагал юзеру обновляться на чужие билды
+  //     без нашего ребрендинга);
+  //   - About-экран и intro-ссылки вели на нашу инфраструктуру.
+  static const appName = "FreeCore VPN";
+  static const githubUrl = "https://github.com/Colortune112/freecore-vpn";
+  static const licenseUrl = "https://github.com/Colortune112/freecore-vpn?tab=License-1-ov-file#readme";
+  static const githubReleasesApiUrl = "https://api.github.com/repos/Colortune112/freecore-vpn/releases";
+  static const githubLatestReleaseUrl = "https://github.com/Colortune112/freecore-vpn/releases/latest";
+  // appcast.xml у нас не используется — оставляем для совместимости с macOS Sparkle
+  // на будущее. Сейчас auto-update идёт ТОЛЬКО через GitHub Releases API.
+  static const appCastUrl = "https://raw.githubusercontent.com/Colortune112/freecore-vpn/main/appcast.xml";
+  static const telegramChannelUrl = "https://t.me/freecore_vpn";
+  static const privacyPolicyUrl = "https://t.me/FreeCore_VPN_bot";
+  static const termsAndConditionsUrl = "https://t.me/FreeCore_VPN_bot";
   static const cfWarpPrivacyPolicy = "https://www.cloudflare.com/application/privacypolicy/";
   static const cfWarpTermsOfService = "https://www.cloudflare.com/application/terms/";
 }
