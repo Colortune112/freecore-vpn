@@ -76,8 +76,21 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
           // /login-tg доступен с экрана активации (push) — пропускаем туда без редиректа.
           return (isActivate || isTgLogin) ? null : '/activate';
         }
+        // Activated, но НИ ОДНОГО профиля в Hiddify-DB не загружено (например,
+        // юзер залогинился через TG но у него нет активной подписки в боте,
+        // либо subscription URL отдал 404). Возвращаем на /activate чтобы
+        // юзер мог ввести ключ — иначе он застрянет на пустом home без
+        // возможности что-либо сделать.
+        final hasProfile = ref.read(hasAnyProfileProvider).value;
+        if (hasProfile == false) {
+          // Сбрасываем local-флаг, чтобы при возврате на /activate юзер мог
+          // повторно ввести ключ или войти через TG.
+          ref.read(freecoreStorageProvider).reset();
+          ref.invalidate(freecoreActivatedProvider);
+          return isActivate || isTgLogin ? null : '/activate';
+        }
         if (isActivate || isTgLogin) {
-          // Уже активирован — игнорируем deep-link на /activate или /login-tg.
+          // Уже активирован и есть профиль — игнорируем deep-link на /activate.
           return '/home';
         }
 

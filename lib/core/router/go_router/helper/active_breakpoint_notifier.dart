@@ -19,9 +19,13 @@ class ActiveBreakpointNotifier extends _$ActiveBreakpointNotifier {
 
 @riverpod
 bool? isMobileBreakpoint(Ref ref) {
+  // FreeCore: принудительно mobile-style layout на всех платформах.
+  // Десктопный sidebar делает интерфейс громоздким для VPN-клиента с одним
+  // профилем — переходим на компактный bottom-nav + полноэкранный home,
+  // как у HAPP. Возвращаем true как только breakpoint вычислен.
   final breakpoint = ref.watch(activeBreakpointNotifierProvider);
   if (breakpoint == null) return null;
-  return breakpoint == Breakpoints.mobile;
+  return true;
 }
 
 class Breakpoint {
