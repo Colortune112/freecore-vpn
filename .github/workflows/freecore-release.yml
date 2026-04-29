@@ -209,7 +209,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag-name || github.ref_name }}
           name: FreeCore VPN ${{ github.event.inputs.tag-name || github.ref_name }}
-          draft: true   # снимет с draft руками после проверки
+          draft: false   # публикуем сразу — иначе /releases/latest/download/* отдаст 404 для не-залогиненных юзеров (включая ссылки из бота и инструкций)
           generate_release_notes: true
           files: |
             artifacts/macos/*
